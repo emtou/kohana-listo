@@ -300,6 +300,7 @@ class Listo_Core
     }
 
     $this->table->set_body_data($data);
+    $this->table->set_user_data('data', $data);
 
     return $this;
   }
