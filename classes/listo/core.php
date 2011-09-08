@@ -32,9 +32,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class Listo_Core
 {
-  protected $_multi     = FALSE; /** Multi mode */
-  protected $_filterset = NULL;  /** Listo_FilterSet instance */
-
+  protected $_actions       = array();
+  protected $_column_keys   = array();
+  protected $_column_titles = array();
+  protected $_multi         = FALSE; /** Multi mode */
+  protected $_filterset     = NULL;  /** Listo_FilterSet instance */
 
   public $alias = '';            /** Alias of this listo */
   public $table = NULL;          /** Table instance */
@@ -56,6 +58,83 @@ class Listo_Core
 
     $this->_filterset = Listo_FilterSet::factory();
   }
+
+
+  /**
+   * Makes the final adjustments before rendering
+   *
+   * @return null;
+   */
+  protected function _pre_render()
+  {
+    // Column titles and keys
+    $column_keys   = $this->_column_keys;
+    $column_titles = $this->_column_titles;
+
+    if ($this->_multi)
+    {
+      $column_keys = array_reverse(array_merge(array_reverse($column_keys), array('select')));
+
+      $column_titles = array_reverse(
+          array_merge(
+              array_reverse($column_titles),
+              array(
+                  form::checkbox(
+                      $this->alias.'_checkall',
+                      __('All'),
+                      FALSE,
+                      array(
+                        'onclick' => 'javascript:function(){
+                                      };"',
+                        'alt'  => __('Select all/none')
+                      )
+                  )
+              )
+          )
+      );
+    }
+
+    // Add a "Actions" column if at least one action requires it
+    $add_action_column     = FALSE;
+    $user_data_actions_one = array();
+
+    foreach ($this->_actions as $action)
+    {
+      if ($action->one)
+      {
+        $add_action_column = TRUE;
+        $user_data_one_actions[] = $action;
+      }
+    }
+
+    if ($add_action_column)
+    {
+      $column_keys[]   = 'action';
+      $column_titles[] = 'Actions';
+
+      function actions_callback($value, $index, $key, $body_data, $user_data, $row_data, $column_data, $table)
+      {
+        $actions = array();
+        foreach ($user_data['one_actions'] as $action)
+        {
+          $actions[] = $action->render_one($user_data, $index);
+        }
+        return implode(' | ', $actions);
+      }
+
+      $this->table->set_callback('actions_callback', 'column', 'action');
+
+      $this->table->set_user_data('one_actions', $user_data_one_actions);
+    }
+
+    $this->table->set_column_filter($column_keys);
+    $this->table->set_column_titles($column_titles);
+
+
+
+
+  }
+
 
 
   /**
@@ -97,11 +176,11 @@ class Listo_Core
    * @param Listo_Action $action Action to be registered
    *
    * @return this
-   *
-   * @todo code this member
    */
   public function add_action(Listo_Action $action)
   {
+    $this->_actions[] = $action;
+
     return $this;
   }
 
@@ -187,6 +266,9 @@ class Listo_Core
    */
   public function render($echo = FALSE)
   {
+
+    $this->_pre_render();
+
     /**
      * Callback to render zebras on odd rows
      *
@@ -224,7 +306,7 @@ class Listo_Core
 
 
   /**
-   * Sets the columns to be shown
+   * Sets the keys of the columns to be shown
    *
    * Chainable method.
    *
@@ -232,14 +314,9 @@ class Listo_Core
    *
    * @return this
    */
-  public function set_column_filter(array $keys)
+  public function set_column_keys(array $keys)
   {
-    if ($this->_multi)
-    {
-      $keys = array_reverse(array_merge(array_reverse($keys), array('select')));
-    }
-
-    $this->table->set_column_filter($keys);
+    $this->_column_keys = $keys;
 
     return $this;
   }
@@ -256,28 +333,7 @@ class Listo_Core
    */
   public function set_column_titles(array $titles)
   {
-    if ($this->_multi)
-    {
-      $titles = array_reverse(
-          array_merge(
-              array_reverse($titles),
-              array(
-                  form::checkbox(
-                      $this->alias.'_checkall',
-                      __('All'),
-                      FALSE,
-                      array(
-                        'onclick' => 'javascript:function(){
-                                      };"',
-                        'alt'  => __('Select all/none')
-                      )
-                  )
-              )
-          )
-      );
-    }
-
-    $this->table->set_column_titles($titles);
+    $this->_column_titles = $titles;
 
     return $this;
   }
