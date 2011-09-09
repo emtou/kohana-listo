@@ -39,6 +39,33 @@ class Listo_Core_Action_Solo extends Listo_Action
 
 
   /**
+   * Callback on actions cells
+   *
+   * @param mixed  $value       value
+   * @param int    $index       index
+   * @param string $key         key
+   * @param array  $body_data   body_data
+   * @param array  $user_data   body_data
+   * @param array  $row_data    row_data
+   * @param array  $column_data column_data
+   * @param Table  $table       table
+   *
+   * @return string HTML cell content
+   */
+  // @codingStandardsIgnoreStart
+  public static function render_cell_callback($value, $index, $key, $body_data, $user_data, $row_data, $column_data, $table)
+  // @codingStandardsIgnoreEnd
+  {
+    $actions = array();
+    foreach ($user_data['solo_actions'] as $action)
+    {
+      $actions[] = $action->render($user_data, $index);
+    }
+    return implode(' | ', $actions);
+  }
+
+
+  /**
    * Creates and initialises the filter
    *
    * @param string $alias Alias of the filter

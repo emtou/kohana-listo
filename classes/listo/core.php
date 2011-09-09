@@ -35,11 +35,31 @@ class Listo_Core
   protected $_actionset     = NULL;     /** Listo_ActionSet instance */
   protected $_column_keys   = array();
   protected $_column_titles = array();
-  protected $_multi         = FALSE;    /** Multi mode */
   protected $_filterset     = NULL;     /** Listo_FilterSet instance */
+  protected $_js_code       = '';       /** Javascript code to add on final page */
+  protected $_params        = array(
+    'action_multi_key' => 'id',
+  );
 
   public $alias = '';                   /** Alias of this listo */
   public $table = NULL;                 /** Table instance */
+
+
+  /**
+   * Callback to render zebras on odd rows
+   *
+   * @param mixed $row   Row data
+   * @param int   $index Index of the current row
+   *
+   * @return string Rendered row
+   */
+  static function zebra_rows_callback($row, $index)
+  {
+    if ($index % 2 == 0)
+    {
+      return new Tr(''.$index, 'zebra');
+    }
+  }
 
 
   /**
@@ -54,7 +74,9 @@ class Listo_Core
   private function __construct($alias)
   {
     $this->alias = $alias;
-    $this->table = Table::factory(array());
+    $this->table = Table::factory();
+    $this->table->set_attributes('id="'.$alias.'"', '');
+
 
     $this->_actionset = Listo_ActionSet::factory();
     $this->_filterset = Listo_FilterSet::factory();
@@ -68,7 +90,7 @@ class Listo_Core
    */
   protected function _pre_render()
   {
-    // Column titles and keys
+    // Actions : Add columns
     $column_keys   = $this->_column_keys;
     $column_titles = $this->_column_titles;
 
@@ -76,8 +98,15 @@ class Listo_Core
         $this->alias,
         $this->_column_keys,
         $this->_column_titles,
-        $this->table
+        $this->table,
+        $this->_js_code
     );
+
+    // Add global params to the inner Table
+    $this->table->set_user_data('params', $this->_params);
+
+    // Add zebra rows coloring
+    $this->table->set_callback('Listo::zebra_rows_callback', 'row');
   }
 
 
@@ -211,26 +240,7 @@ class Listo_Core
    */
   public function render($echo = FALSE)
   {
-
     $this->_pre_render();
-
-    /**
-     * Callback to render zebras on odd rows
-     *
-     * @param mixed $row   Row data
-     * @param int   $index Index of the current row
-     *
-     * @return string Rendered row
-     */
-    function listo_format_zebra_row($row, $index)
-    {
-      if ($index % 2 == 0)
-      {
-        return new Tr(''.$index, 'zebra');
-      }
-    }
-
-    $this->table->set_callback('listo_format_zebra_row', 'row');
 
     $view = View::factory('listo/default');
 
@@ -249,6 +259,18 @@ class Listo_Core
     return $html;
   }
 
+
+  /**
+   * Javascript code
+   *
+   * Call AFTER render() !
+   *
+   * @return string Javascript code
+   */
+  public function js_code()
+  {
+    return $this->_js_code;
+  }
 
   /**
    * Sets the keys of the columns to be shown
@@ -325,19 +347,18 @@ class Listo_Core
 
 
   /**
-   * Sets multimode on
+   * Sets a internal param
    *
    * Chainable method.
    *
-   * @return this
+   * @param string $alias Alias of the param
+   * @param mixed  $value Value of the param
    *
-   * @todo where is this add_checkbox callback defined ?
+   * @return this
    */
-  public function set_multi()
+  public function set_param($alias, $value)
   {
-    $this->_multi = TRUE;
-
-    $this->table->set_callback('add_checkbox', 'column', 'select');
+    $this->_params[$alias] = $value;
 
     return $this;
   }
