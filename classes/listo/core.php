@@ -32,14 +32,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class Listo_Core
 {
-  protected $_actions       = array();
+  protected $_actionset     = NULL;     /** Listo_ActionSet instance */
   protected $_column_keys   = array();
   protected $_column_titles = array();
-  protected $_multi         = FALSE; /** Multi mode */
-  protected $_filterset     = NULL;  /** Listo_FilterSet instance */
+  protected $_multi         = FALSE;    /** Multi mode */
+  protected $_filterset     = NULL;     /** Listo_FilterSet instance */
 
-  public $alias = '';            /** Alias of this listo */
-  public $table = NULL;          /** Table instance */
+  public $alias = '';                   /** Alias of this listo */
+  public $table = NULL;                 /** Table instance */
 
 
   /**
@@ -56,6 +56,7 @@ class Listo_Core
     $this->alias = $alias;
     $this->table = Table::factory(array());
 
+    $this->_actionset = Listo_ActionSet::factory();
     $this->_filterset = Listo_FilterSet::factory();
   }
 
@@ -71,68 +72,12 @@ class Listo_Core
     $column_keys   = $this->_column_keys;
     $column_titles = $this->_column_titles;
 
-    if ($this->_multi)
-    {
-      $column_keys = array_reverse(array_merge(array_reverse($column_keys), array('select')));
-
-      $column_titles = array_reverse(
-          array_merge(
-              array_reverse($column_titles),
-              array(
-                  form::checkbox(
-                      $this->alias.'_checkall',
-                      __('All'),
-                      FALSE,
-                      array(
-                        'onclick' => 'javascript:function(){
-                                      };"',
-                        'alt'  => __('Select all/none')
-                      )
-                  )
-              )
-          )
-      );
-    }
-
-    // Add a "Actions" column if at least one action requires it
-    $add_action_column     = FALSE;
-    $user_data_actions_one = array();
-
-    foreach ($this->_actions as $action)
-    {
-      if ($action->one)
-      {
-        $add_action_column = TRUE;
-        $user_data_one_actions[] = $action;
-      }
-    }
-
-    if ($add_action_column)
-    {
-      $column_keys[]   = 'action';
-      $column_titles[] = 'Actions';
-
-      function actions_callback($value, $index, $key, $body_data, $user_data, $row_data, $column_data, $table)
-      {
-        $actions = array();
-        foreach ($user_data['one_actions'] as $action)
-        {
-          $actions[] = $action->render_one($user_data, $index);
-        }
-        return implode(' | ', $actions);
-      }
-
-      $this->table->set_callback('actions_callback', 'column', 'action');
-
-      $this->table->set_user_data('one_actions', $user_data_one_actions);
-    }
-
-    $this->table->set_column_filter($column_keys);
-    $this->table->set_column_titles($column_titles);
-
-
-
-
+    $this->_actionset->pre_render(
+        $this->alias,
+        $this->_column_keys,
+        $this->_column_titles,
+        $this->table
+    );
   }
 
 
@@ -179,7 +124,7 @@ class Listo_Core
    */
   public function add_action(Listo_Action $action)
   {
-    $this->_actions[] = $action;
+    $this->_actionset->add_action($action);
 
     return $this;
   }
