@@ -57,7 +57,7 @@ class Listo_Core_ActionSet
    *
    * @return rendered action set in HTML
    */
-  protected function _render_multi_actions()
+  protected function _render_multi_actions_selector()
   {
     $html = '';
 
@@ -66,10 +66,25 @@ class Listo_Core_ActionSet
 
     foreach ($this->_multi_actions as $action)
     {
-      $action->add_select_option($actions, $js_code);
+      $action->add_select_option($actions);
     }
 
     $html .= Form::select('multi_actions', $actions, 'NOACTION');
+
+    return $html;
+  }
+
+
+  /**
+   * Renders the action set validation button
+   *
+   * @return rendered action set in HTML
+   */
+  protected function _render_multi_actions_validator()
+  {
+    $html = '';
+
+    $html .= Form::input('doaction', 'OK', array('type' => 'submit'));
 
     return $html;
   }
@@ -125,7 +140,13 @@ class Listo_Core_ActionSet
   {
     if (sizeof($this->_multi_actions) > 0)
     {
-      $js_code .= Listo_Action_Multi::js_code($alias);
+      $multi_js_code = array();
+      foreach ($this->_multi_actions as $action)
+      {
+        $action->js_code($multi_js_code);
+      }
+
+      $js_code .= Listo_Action_Multi::global_js_code($alias, $multi_js_code);
 
       Listo_Action_Multi::add_select_column($alias, $column_keys, $column_titles, $table);
     }
@@ -159,7 +180,8 @@ class Listo_Core_ActionSet
   {
     $multi_view = View::factory($this->_multi_view);
 
-    $multi_view->set('content', $this->_render_multi_actions());
+    $multi_view->set('action_selector', $this->_render_multi_actions_selector());
+    $multi_view->set('action_validator', $this->_render_multi_actions_validator());
     $multi_view->set('alias',   $this->_alias);
 
     $html = $multi_view->render();

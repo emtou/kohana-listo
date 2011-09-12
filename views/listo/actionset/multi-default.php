@@ -29,7 +29,8 @@ echo '</span>';
 
 echo '<span class="actions">';
 echo 'Actions: ';
-echo $content;
+echo $action_selector;
+echo $action_validator;
 echo '</span>';
 
 echo '</div>';
