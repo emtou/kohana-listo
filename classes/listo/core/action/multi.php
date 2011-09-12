@@ -57,7 +57,7 @@ class Listo_Core_Action_Multi extends Listo_Action
             array_reverse($column_titles),
             array(
                 form::checkbox(
-                    $alias.'_checkall',
+                    $alias.'_multiaction_checkbox',
                     __('All'),
                     FALSE,
                     array(
@@ -85,20 +85,70 @@ class Listo_Core_Action_Multi extends Listo_Action
 
     // Check/Uncheck all boxes
     $js_code .= "
-      $(':input[name=".$alias."_checkall]').click(
+      $(':input[name=".$alias."_multiaction_checkbox]').live(
+        'change',
         function()
         {
-          var cases = $('#".$alias."').find(':input[name^=select]');
-          if (this.checked)
-          {
-            cases.attr('checked', true);
-          }
-          else
-          {
-            cases.attr('checked', false);
-          }
+          $(':input[name^=select]').attr(
+            'checked',
+            $(this).is(':checked') ? 'checked' : ''
+          );
         }
-    )";
+      );
+
+			$(':input[name^=select]').live(
+        'change',
+        function()
+        {
+          $(':input[name^=select]').length == $(':input[name^=select]:checked').length
+           ? $(':input[name=".$alias."_multiaction_checkbox]').attr('checked', 'true')
+           : $(':input[name=".$alias."_multiaction_checkbox]').attr('checked', '' )
+          ;
+			});
+
+      $('#".$alias."_multiaction_checkall').live(
+        'click',
+        function()
+        {
+          $(':input[name^=select]').each(
+            function()
+            {
+              $(this).attr('checked', 'checked');
+            }
+          ).trigger('change');
+        }
+      );
+
+      $('#".$alias."_multiaction_uncheckall').live(
+        'click',
+        function()
+        {
+          $(':input[name^=select]').each(
+            function()
+            {
+              $(this).attr('checked', '');
+            }
+          ).trigger('change');
+        }
+      );
+
+      $('#".$alias."_multiaction_invertall').live(
+        'click',
+        function()
+        {
+          $(':input[name^=select]').each(
+            function()
+            {
+              $(this).attr(
+                'checked',
+                $(this).is(':checked') ? '' : 'checked'
+              );
+            }
+          ).trigger('change');
+        }
+      );
+
+    ";
 
     return $js_code;
   }

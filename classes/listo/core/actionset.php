@@ -32,6 +32,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class Listo_Core_ActionSet
 {
+  protected $_alias         = '';
   protected $_multi         = FALSE;
   protected $_multi_actions = array(); /** Array of Listo_Action instances */
   protected $_solo_actions  = array(); /** Array of Listo_Action instances */
@@ -45,8 +46,9 @@ class Listo_Core_ActionSet
    *
    * @return null
    */
-  private function __construct()
+  private function __construct($alias)
   {
+    $this->_alias = $alias;
   }
 
 
@@ -102,9 +104,9 @@ class Listo_Core_ActionSet
    *
    * @return Listo
    */
-  public static function factory()
+  public static function factory($alias)
   {
-    return new self;
+    return new self($alias);
   }
 
 
@@ -158,6 +160,7 @@ class Listo_Core_ActionSet
     $multi_view = View::factory($this->_multi_view);
 
     $multi_view->set('content', $this->_render_multi_actions());
+    $multi_view->set('alias',   $this->_alias);
 
     $html = $multi_view->render();
 

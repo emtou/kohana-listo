@@ -19,10 +19,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
 echo '<div class="multi_actions">';
 echo '<span class="arrow">↖</span>';
 echo '<span class="links">';
-  echo 'check';
+  echo '<span class="jslink" id="'.$alias.'_multiaction_checkall">check all</span>';
   echo '/';
-  echo 'uncheck';
-  echo ' all';
+  echo '<span class="jslink" id="'.$alias.'_multiaction_uncheckall">uncheck all</span>';
+  echo '/';
+  echo '<span class="jslink" id="'.$alias.'_multiaction_invertall">invert</span>';
+
 echo '</span>';
 
 echo '<span class="actions">';

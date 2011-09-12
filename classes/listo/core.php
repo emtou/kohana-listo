@@ -78,7 +78,7 @@ class Listo_Core
     $this->table->set_attributes('id="'.$alias.'"', '');
 
 
-    $this->_actionset = Listo_ActionSet::factory();
+    $this->_actionset = Listo_ActionSet::factory($this->alias);
     $this->_filterset = Listo_FilterSet::factory();
   }
 
