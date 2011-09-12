@@ -29,6 +29,6 @@ echo $table;
 if ($actions)
 {
   echo '<div name="'.$alias.'_actions">';
-  echo $filters;
+  echo $actions;
   echo '</div>';
 }

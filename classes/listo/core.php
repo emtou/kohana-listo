@@ -116,11 +116,14 @@ class Listo_Core
    *
    * @return rendered actions in HTML
    *
-   * @todo code this member
+   * @see Listo_ActionSet::render()
    */
   protected function _render_actions()
   {
     $html = '';
+
+    $html .= $this->_actionset->render();
+
     return $html;
   }
 

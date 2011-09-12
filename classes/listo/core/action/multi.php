@@ -151,4 +151,27 @@ class Listo_Core_Action_Multi extends Listo_Action
     $this->_label = $label;
   }
 
+
+  /**
+   * Adds selection option to actions array
+   *
+   * @param array  &$actions Actions array
+   * @param string &$js_code Javascript code
+   *
+   * @return null
+   */
+  public function add_select_option(array & $actions, & $js_code)
+  {
+    $actions[$this->_alias] = $this->_label;
+
+    // Auto-submit on multi action selection
+    $js_code .= "
+      $('select[name=multi_actions] option[value=".$this->_alias."]').select(
+        function()
+        {
+          console.debug(this.value);
+        });
+    )";
+  }
+
 } // End Listo_Core_Action_Multi

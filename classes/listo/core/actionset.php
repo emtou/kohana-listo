@@ -51,6 +51,29 @@ class Listo_Core_ActionSet
 
 
   /**
+   * Renders the action set
+   *
+   * @return rendered action set in HTML
+   */
+  protected function _render_multi_actions()
+  {
+    $html = '';
+
+    $actions     = array();
+    $actions['NOACTION'] = __('-- Select an action --');
+
+    foreach ($this->_multi_actions as $action)
+    {
+      $action->add_select_option($actions, $js_code);
+    }
+
+    $html .= Form::select('multi_actions', $actions, 'NOACTION');
+
+    return $html;
+  }
+
+
+  /**
    * Registers an action in the action set
    *
    * Chainable method.
@@ -132,11 +155,11 @@ class Listo_Core_ActionSet
    */
   public function render($echo = FALSE)
   {
-    $view = View::factory($this->_view);
+    $multi_view = View::factory($this->_multi_view);
 
-    $view->set('content', $this->_render_actions());
+    $multi_view->set('content', $this->_render_multi_actions());
 
-    $html = $view->render();
+    $html = $multi_view->render();
 
     if ($echo)
     {
