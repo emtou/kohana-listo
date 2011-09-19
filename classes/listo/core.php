@@ -40,6 +40,7 @@ class Listo_Core
   protected $_params        = array(
     'action_multi_key' => 'id',
   );
+  protected $_view          = NULL;     /** View to render listo in */
 
   public $alias = '';                   /** Alias of this listo */
   public $table = NULL;                 /** Table instance */
@@ -80,6 +81,7 @@ class Listo_Core
 
     $this->_actionset = Listo_ActionSet::factory($this->alias);
     $this->_filterset = Listo_FilterSet::factory();
+    $this->_view      = View::factory('listo/default');
   }
 
 
@@ -245,14 +247,12 @@ class Listo_Core
   {
     $this->_pre_render();
 
-    $view = View::factory('listo/default');
+    $this->view()->set('actions', $this->_render_actions());
+    $this->view()->set('alias',   $this->alias);
+    $this->view()->set('filters', $this->_render_filters());
+    $this->view()->set('table',   $this->table->render());
 
-    $view->set('actions', $this->_render_actions());
-    $view->set('alias',   $this->alias);
-    $view->set('filters', $this->_render_filters());
-    $view->set('table',   $this->table->render());
-
-    $html = $view->render();
+    $html = $this->view()->render();
 
     if ($echo)
     {
@@ -381,6 +381,17 @@ class Listo_Core
   public function set_view($view)
   {
     return $this;
+  }
+
+
+  /**
+   * Returns the View
+   *
+   * @return View
+   */
+  public function view()
+  {
+    return $this->_view;
   }
 
 } // End Listo_Core
