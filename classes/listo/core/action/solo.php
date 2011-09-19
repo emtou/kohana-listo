@@ -61,7 +61,7 @@ class Listo_Core_Action_Solo extends Listo_Action
     {
       $actions[] = $action->render($user_data, $index);
     }
-    return implode(' | ', $actions);
+    return implode('', $actions);
   }
 
 
@@ -118,17 +118,17 @@ class Listo_Core_Action_Solo extends Listo_Action
 
 
   /**
-   * Registers options fot the filter
+   * Set the label for the action
    *
    * Chainable method.
    *
-   * @param array $options Options to register
+   * @param string $label Label of the action
    *
    * @return this
    */
-  public function set_options(array $options)
+  public function set_label($label)
   {
-    $this->_options = $options;
+    $this->_label = $label;
 
     return $this;
   }
