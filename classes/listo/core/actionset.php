@@ -32,11 +32,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class Listo_Core_ActionSet
 {
-  protected $_alias         = '';
-  protected $_multi         = FALSE;
-  protected $_multi_actions = array(); /** Array of Listo_Action instances */
-  protected $_solo_actions  = array(); /** Array of Listo_Action instances */
-  protected $_multi_view    = 'listo/actionset/multi-default';
+  protected $_alias               = '';
+  protected $_multi               = FALSE;
+  protected $_multi_actions       = array(); /** Array of Listo_Action instances */
+  protected $_multi_view          = 'listo/actionset/multi-default';
+  protected $_selector_attributes = array(); /** Array of html select attributes */
+  protected $_solo_actions        = array(); /** Array of Listo_Action instances */
 
 
   /**
@@ -69,7 +70,7 @@ class Listo_Core_ActionSet
       $action->add_select_option($actions);
     }
 
-    $html .= Form::select('multi_actions', $actions, 'NOACTION');
+    $html .= Form::select('multi_actions', $actions, 'NOACTION', $this->_selector_attributes);
 
     return $html;
   }
@@ -109,6 +110,24 @@ class Listo_Core_ActionSet
     {
       array_push($this->_multi_actions, $action);
     }
+
+    return $this;
+  }
+
+
+  /**
+   * Set an attribute to the selector
+   *
+   * Chainable method.
+   *
+   * @param string $alias Alias of the attribute
+   * @param mixed  $value Value of the attribute
+   *
+   * @return this
+   */
+  public function attr($alias, $value)
+  {
+    $this->_selector_attributes[$alias] = $value;
 
     return $this;
   }
@@ -155,7 +174,7 @@ class Listo_Core_ActionSet
     if (sizeof($this->_solo_actions) > 0)
     {
       $column_keys[]   = 'action';
-      $column_titles[] = 'Actions';
+      $column_titles[] = '';
 
       $table->set_callback('Listo_Action_Solo::render_cell_callback', 'column', 'action');
       $table->set_user_data('solo_actions', $this->_solo_actions);
