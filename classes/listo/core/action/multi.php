@@ -41,17 +41,20 @@ class Listo_Core_Action_Multi extends Listo_Action
   /**
    * Adds a first checkbox column in Table
    *
-   * @param string       $alias          Alias of the parent Listo
-   * @param array        &$column_keys   Column keys
-   * @param array        &$column_titles Column titles
-   * @param Kohana_Table &$table         Table instance
+   * @param string       $alias              Alias of the parent Listo
+   * @param array        &$column_attributes Column attributes
+   * @param array        &$column_keys       Column keys
+   * @param array        &$column_titles     Column titles
+   * @param Kohana_Table &$table             Table instance
    *
    * @return null
    */
-  public static function add_select_column($alias, array & $column_keys, array & $column_titles, Kohana_Table & $table)
+  public static function add_select_column($alias, array & $column_attributes, array & $column_keys, array & $column_titles, Kohana_Table & $table)
   {
+    // Set new column key
     $column_keys = array_reverse(array_merge(array_reverse($column_keys), array('select')));
 
+    // Set new column title
     $column_titles = array_reverse(
         array_merge(
             array_reverse($column_titles),
@@ -68,7 +71,14 @@ class Listo_Core_Action_Multi extends Listo_Action
         )
     );
 
+    // Set new column callback
     $table->set_callback('Listo_Action_Multi::render_cell_callback', 'column', 'select');
+
+    // Set new column attributes
+    foreach (array_keys($column_attributes) as $type)
+    {
+      array_unshift($column_attributes[$type], NULL);
+    }
   }
 
 

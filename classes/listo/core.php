@@ -32,15 +32,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class Listo_Core
 {
-  protected $_actionset     = NULL;     /** Listo_ActionSet instance */
-  protected $_column_keys   = array();
-  protected $_column_titles = array();
-  protected $_filterset     = NULL;     /** Listo_FilterSet instance */
-  protected $_js_code       = '';       /** Javascript code to add on final page */
-  protected $_params        = array(
+  protected $_actionset         = NULL;     /** Listo_ActionSet instance */
+  protected $_column_attributes = array();
+  protected $_column_keys       = array();
+  protected $_column_titles     = array();
+  protected $_filterset         = NULL;     /** Listo_FilterSet instance */
+  protected $_js_code           = '';       /** Javascript code to add on final page */
+  protected $_params            = array(
     'action_multi_key' => 'id',
   );
-  protected $_view          = NULL;     /** View to render listo in */
+  protected $_view              = NULL;     /** View to render listo in */
 
   public $alias = '';                   /** Alias of this listo */
   public $table = NULL;                 /** Table instance */
@@ -98,11 +99,20 @@ class Listo_Core
 
     $this->_actionset->pre_render(
         $this->alias,
+        $this->_column_attributes,
         $this->_column_keys,
         $this->_column_titles,
         $this->table,
         $this->_js_code
     );
+
+    // Set table configuration
+    foreach ($this->_column_attributes as $type => $data)
+    {
+      $this->table->set_column_attributes($type, $data);
+    }
+    $this->table->set_column_filter($this->_column_keys);
+    $this->table->set_column_titles($this->_column_titles);
 
     // Add global params to the inner Table
     $this->table->set_user_data('params', $this->_params);
@@ -274,6 +284,34 @@ class Listo_Core
   {
     return $this->_js_code;
   }
+
+
+  /**
+   * Sets attributes to the columns
+   *
+   * Chainable method.
+   *
+   * @param string $type Attribute type
+   * @param array  $data Attribute values
+   *
+   * @return this
+   *
+   * @see Table::set_column_attributes()
+   */
+  public function set_column_attributes($type, $data)
+  {
+    // get attributes by argument if an array isn't passed
+    if ( ! is_array($data))
+    {
+      $data = func_get_args();
+      array_shift($data);
+    }
+
+    $this->_column_attributes[$type] = $data;
+
+    return $this;
+  }
+
 
   /**
    * Sets the keys of the columns to be shown

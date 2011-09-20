@@ -147,15 +147,16 @@ class Listo_Core_ActionSet
   /**
    * Adds multi and solo actions to the Filto inner Table
    *
-   * @param string $alias         Alias of the Filto
-   * @param array  $column_keys   Column keys
-   * @param array  $column_titles Column titles
-   * @param Table  &$table        Table instance
-   * @param string &$js_code      Javascript code
+   * @param string $alias              Alias of the Filto
+   * @param array  &$column_attributes Column keys
+   * @param array  &$column_keys       Column keys
+   * @param array  &$column_titles     Column titles
+   * @param Table  &$table             Table instance
+   * @param string &$js_code           Javascript code
    *
    * @return null
    */
-  public function pre_render($alias, $column_keys, $column_titles, & $table, & $js_code)
+  public function pre_render($alias, & $column_attributes, & $column_keys, & $column_titles, & $table, & $js_code)
   {
     if (sizeof($this->_multi_actions) > 0)
     {
@@ -167,7 +168,7 @@ class Listo_Core_ActionSet
 
       $js_code .= Listo_Action_Multi::global_js_code($alias, $multi_js_code);
 
-      Listo_Action_Multi::add_select_column($alias, $column_keys, $column_titles, $table);
+      Listo_Action_Multi::add_select_column($alias, $column_attributes, $column_keys, $column_titles, $table);
     }
 
 
@@ -179,9 +180,6 @@ class Listo_Core_ActionSet
       $table->set_callback('Listo_Action_Solo::render_cell_callback', 'column', 'action');
       $table->set_user_data('solo_actions', $this->_solo_actions);
     }
-
-    $table->set_column_filter($column_keys);
-    $table->set_column_titles($column_titles);
 
   }
 
