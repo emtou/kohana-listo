@@ -225,7 +225,8 @@ class Listo_Core_Action_Multi extends Listo_Action
             'class' => 'checkbox',
           )
       ),
-      'center'
+      NULL,
+      'white-space:nowrap;vertical-align:middle;'
     );
   }
 

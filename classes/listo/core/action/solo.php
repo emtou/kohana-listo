@@ -61,7 +61,11 @@ class Listo_Core_Action_Solo extends Listo_Action
     {
       $actions[] = $action->render($user_data, $index);
     }
-    return implode('', $actions);
+    return new Td(
+      implode('', $actions),
+      NULL,
+      'white-space:nowrap;vertical-align:middle;'
+    );
   }
 
 
