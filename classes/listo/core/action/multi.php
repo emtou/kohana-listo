@@ -100,64 +100,22 @@ class Listo_Core_Action_Multi extends Listo_Action
         'change',
         function()
         {
-          $(':input[name^=select]').attr(
-            'checked',
-            $(this).is(':checked') ? 'checked' : ''
+          $(':input[name^=select]').each(
+            function()
+            {
+              if ($(this).is(':checked'))
+              {
+                $(this).removeAttr('checked');
+              }
+              else
+              {
+                $(this).attr('checked', 'checked');
+              }
+            }
           );
         }
       );
 
-			$(':input[name^=select]').live(
-        'change',
-        function()
-        {
-          $(':input[name^=select]').length == $(':input[name^=select]:checked').length
-           ? $(':input[name=".$alias."_multiaction_checkbox]').attr('checked', 'true')
-           : $(':input[name=".$alias."_multiaction_checkbox]').attr('checked', '' )
-          ;
-			});
-
-      $('#".$alias."_multiaction_checkall').live(
-        'click',
-        function()
-        {
-          $(':input[name^=select]').each(
-            function()
-            {
-              $(this).attr('checked', 'checked');
-            }
-          ).trigger('change');
-        }
-      );
-
-      $('#".$alias."_multiaction_uncheckall').live(
-        'click',
-        function()
-        {
-          $(':input[name^=select]').each(
-            function()
-            {
-              $(this).attr('checked', '');
-            }
-          ).trigger('change');
-        }
-      );
-
-      $('#".$alias."_multiaction_invertall').live(
-        'click',
-        function()
-        {
-          $(':input[name^=select]').each(
-            function()
-            {
-              $(this).attr(
-                'checked',
-                $(this).is(':checked') ? '' : 'checked'
-              );
-            }
-          ).trigger('change');
-        }
-      );
     ";
 
     // Auto-submit on multi action selection
