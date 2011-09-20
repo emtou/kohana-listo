@@ -48,23 +48,6 @@ class Listo_Core
 
 
   /**
-   * Callback to render zebras on odd rows
-   *
-   * @param mixed $row   Row data
-   * @param int   $index Index of the current row
-   *
-   * @return string Rendered row
-   */
-  static function zebra_rows_callback($row, $index)
-  {
-    if ($index % 2 == 0)
-    {
-      return new Tr(''.$index, 'zebra');
-    }
-  }
-
-
-  /**
    * Creates and initialises the listo
    *
    * Can't be called, the factory() method must be used.
@@ -117,8 +100,6 @@ class Listo_Core
     // Add global params to the inner Table
     $this->table->set_user_data('params', $this->_params);
 
-    // Add zebra rows coloring
-    $this->table->set_callback('Listo::zebra_rows_callback', 'row');
   }
 
 
