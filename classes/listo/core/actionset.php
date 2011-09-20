@@ -85,7 +85,7 @@ class Listo_Core_ActionSet
   {
     $html = '';
 
-    $html .= Form::input('doaction', 'OK', array('type' => 'submit'));
+    $html .= Form::input('doaction', __('OK'), array('type' => 'submit'));
 
     return $html;
   }
