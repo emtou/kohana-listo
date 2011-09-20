@@ -18,5 +18,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 return array
 (
-  'Listo Filter class type not found: :type' => 'Type de Listo Filter inconnu : :type'
+  'Listo Filter class type not found: :type' => 'Type de Listo Filter inconnu : :type',
+
+  '-- Select an action --' => '-- Sélectionner une action --',
 );
