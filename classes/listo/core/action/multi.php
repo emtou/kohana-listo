@@ -227,23 +227,33 @@ class Listo_Core_Action_Multi extends Listo_Action
   {
     $js_code = '';
 
-    if ($this->_type == Listo_Action::DIRECTROUTE)
+    switch ($this->_type)
     {
-      if ($this->_params['method'] == 'GET')
-      {
+      case Listo_Action::DIRECTROUTE :
+        if ($this->_params['method'] == 'GET')
+        {
+          $multi_js_code[$this->_alias] = "".
+            "var url = '".Route::url($this->_params['route'], $this->_params['uri'])."';\n\n".
+            "".
+            "var selected_values = $('input[name^=select]:checked').map(function(){".
+            "  return $(this).val();".
+            "}).get().join(',');".
+            "if (selected_values != '') {".
+            "  url = url.replace(/:selected_values/i, selected_values);".
+            "  window.location.replace(url);".
+            "}".
+            ""
+            ;
+        }
+      break;
+
+      case Listo_Action::FILLFIELD :
         $multi_js_code[$this->_alias] = "".
-          "var url = '".Route::url($this->_params['route'], $this->_params['uri'])."';\n\n".
-          "".
-          "var selected_values = $('input[name^=select]:checked').map(function(){".
-          "  return $(this).val();".
-          "}).get().join(',');".
-          "if (selected_values != '') {".
-          "  url = url.replace(/:selected_values/i, selected_values);".
-          "  window.location.replace(url);".
-          "}".
-          ""
-          ;
-      }
+            "var selected_values = $('input[name^=select]:checked').map(function(){".
+            "  return $(this).val();".
+            "}).get().join(',');".
+            "$('#".$this->_params['fieldid']."').text(selected_values);";
+      break;
     }
 
   }

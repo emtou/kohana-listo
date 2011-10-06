@@ -33,6 +33,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class Listo_Core_Action
 {
   const DIRECTROUTE = 'Listo_Action::DIRECTROUTE';
+  const FILLFIELD   = 'Listo_Action::FILLFIELD';
   const MULTI       = 'Listo_Action_Multi';
   const SOLO        = 'Listo_Action_Solo';
 
