@@ -394,11 +394,11 @@ class Listo_Core
    * @param string $view Name of the view
    *
    * @return this
-   *
-   * @todo code this member
    */
   public function set_view($view)
   {
+    $this->_view = View::factory($view);
+
     return $this;
   }
 
