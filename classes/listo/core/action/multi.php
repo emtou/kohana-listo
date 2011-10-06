@@ -111,6 +111,7 @@ class Listo_Core_Action_Multi extends Listo_Action
               {
                 $(this).attr('checked', 'checked');
               }
+              $(this).change();
             }
           );
         }
