@@ -32,10 +32,11 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class Listo_Core_Action_Solo extends Listo_Action
 {
-  protected $_alias    = '';
-  protected $_label    = '';
-  protected $_options  = array();
-  protected $_selected = '';
+  protected $_alias         = '';
+  protected $_disable_rules = array();
+  protected $_label         = '';
+  protected $_options       = array();
+  protected $_selected      = '';
 
 
   /**
@@ -84,6 +85,28 @@ class Listo_Core_Action_Solo extends Listo_Action
   }
 
 
+  /**
+   * Add a disable rule
+   *
+   * Examples :
+   *  - ':value(id)', '=', 1
+   *  - ':value(date)', '=', '2010-05-03'
+   *
+   * Chainable method
+   *
+   * @param string $subject  subject the rule applies to
+   * @param string $operator operator of the subject and the what
+   * @param mixed  $what     what
+   *
+   * @return $this
+   */
+  public function disable_if($subject, $operator, $what)
+  {
+    $this->_disable_rules[] = array($subject, $operator, $what);
+
+    return $this;
+  }
+
 
   /**
    * Renders the action in "one" mode
@@ -97,6 +120,9 @@ class Listo_Core_Action_Solo extends Listo_Action
   {
     if ($this->_type == Listo_Action::DIRECTROUTE)
     {
+      if ($this->test_disable($user_data, $index))
+        return '';
+
       $uri = array();
 
       foreach ($this->_params['uri'] as $key => $value)
@@ -152,6 +178,42 @@ class Listo_Core_Action_Solo extends Listo_Action
     $this->_selected = $selected;
 
     return $this;
+  }
+
+
+  /**
+   * Test if a disable rule fires
+   *
+   * @param mixed $user_data User data from the table module
+   * @param int   $index     Index of the current row
+   *
+   * @return bool disable ?
+   */
+  public function test_disable($user_data, $index)
+  {
+    foreach ($this->_disable_rules as $rule)
+    {
+      $submatches = array();
+      if (preg_match('/^:value\((\w+)\)$/D', $rule[0], $submatches))
+      {
+        $field_alias = $submatches[1];
+        switch ($rule[1])
+        {
+          case '=' :
+            if ($user_data['data'][$index]->{$field_alias} == $rule[2])
+              return TRUE;
+          break;
+
+          default :
+            throw new Listo_Exception(
+              'Can\'t test action disabling : unknown rule operator :operator',
+              array(':operator' => $rule[1])
+            );
+        }
+      }
+    }
+
+    return FALSE;
   }
 
 } // End Listo_Core_Action_Solo
