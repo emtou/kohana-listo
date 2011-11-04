@@ -184,10 +184,14 @@ class Listo_Core_Action_Solo extends Listo_Action
   /**
    * Test if a disable rule fires
    *
+   * Currently, the only rule operators are '=' and '!='
+   *
    * @param mixed $user_data User data from the table module
    * @param int   $index     Index of the current row
    *
    * @return bool disable ?
+   *
+   * @throws Listo_Exception Can't test action disabling: unknown rule operator :operator
    */
   public function test_disable($user_data, $index)
   {
@@ -204,9 +208,14 @@ class Listo_Core_Action_Solo extends Listo_Action
               return TRUE;
           break;
 
+          case '!=' :
+            if ($user_data['data'][$index]->{$field_alias} != $rule[2])
+              return TRUE;
+          break;
+
           default :
             throw new Listo_Exception(
-              'Can\'t test action disabling : unknown rule operator :operator',
+              'Can\'t test action disabling: unknown rule operator :operator',
               array(':operator' => $rule[1])
             );
         }
