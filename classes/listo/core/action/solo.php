@@ -213,6 +213,16 @@ class Listo_Core_Action_Solo extends Listo_Action
               return TRUE;
           break;
 
+          case 'match' :
+            if (preg_match($rule[2], $user_data['data'][$index]->{$field_alias}))
+              return TRUE;
+          break;
+
+          case '!match' :
+            if ( ! preg_match($rule[2], $user_data['data'][$index]->{$field_alias}))
+              return TRUE;
+          break;
+
           default :
             throw new Listo_Exception(
               'Can\'t test action disabling: unknown rule operator :operator',
