@@ -145,6 +145,28 @@ class Listo_Core_ActionSet
 
 
   /**
+   * Checks if this ActionSet contains actions of type MULTI
+   *
+   * @return bool ActionSet contains actions of type MULTI ?
+   */
+  public function has_multiactions()
+  {
+    return count($this->_multi_actions) > 0;
+  }
+
+
+  /**
+   * Checks if this ActionSet contains actions of type SOLO
+   *
+   * @return bool ActionSet contains actions of type SOLO ?
+   */
+  public function has_soloactions()
+  {
+    return count($this->_solo_actions) > 0;
+  }
+
+
+  /**
    * Adds multi and solo actions to the Filto inner Table
    *
    * @param string $alias              Alias of the Filto

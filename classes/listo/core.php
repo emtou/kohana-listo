@@ -224,6 +224,29 @@ class Listo_Core
 
 
   /**
+   * Checks if the inner ActionSet contains actions of type MULTI
+   *
+   * @return bool inner ActionSet contains actions of type MULTI ?
+   */
+  public function has_multiactions()
+  {
+    return $this->_actionset->has_multiactions();
+  }
+
+
+  /**
+   * Checks if the inner ActionSet contains actions of type SOLO
+   *
+   * @return bool inner ActionSet contains actions of type SOLO ?
+   */
+  public function has_soloactions()
+  {
+    return $this->_actionset->has_soloactions();
+  }
+
+
+
+  /**
    * Renders the listo
    *
    * @param bool $echo Should the output be echoed
