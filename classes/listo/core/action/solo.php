@@ -86,6 +86,60 @@ class Listo_Core_Action_Solo extends Listo_Action
 
 
   /**
+   * Test if a disable rule fires
+   *
+   * @param array $rule      Rule definition
+   * @param mixed $user_data User data from the table module
+   * @param int   $index     Index of the current row
+   *
+   * @return bool disable ?
+   *
+   * @throws Listo_Exception Can't test action disabling: unknown rule operator :operator
+   */
+  protected function _test_disable_rule(array $rule, $user_data, $index)
+  {
+    $submatches = array();
+    if (preg_match('/^:value\((\w+)\)$/D', $rule[0], $submatches))
+    {
+      $field_alias = $submatches[1];
+      switch ($rule[1])
+      {
+        case '=' :
+          if ($user_data['data'][$index]->{$field_alias} == $rule[2])
+            return TRUE;
+        break;
+
+        case '!=' :
+          if ($user_data['data'][$index]->{$field_alias} != $rule[2])
+            return TRUE;
+        break;
+
+        case 'match' :
+          if (preg_match($rule[2], $user_data['data'][$index]->{$field_alias}))
+            return TRUE;
+        break;
+
+        case '!match' :
+          if ( ! preg_match($rule[2], $user_data['data'][$index]->{$field_alias}))
+            return TRUE;
+        break;
+
+        default :
+          throw new Listo_Exception(
+            'Can\'t test action disabling: unknown rule operator :operator',
+            array(':operator' => $rule[1])
+          );
+      }
+    }
+
+    throw new Listo_Exception(
+      'Can\'t test action disabling: unparsable rule subject :subject',
+      array(':subject' => $rule[0])
+    );
+  }
+
+
+  /**
    * Add a disable rule
    *
    * Examples :
@@ -182,7 +236,7 @@ class Listo_Core_Action_Solo extends Listo_Action
 
 
   /**
-   * Test if a disable rule fires
+   * Test if any disable rule fires
    *
    * Currently, the only rule operators are '=' and '!='
    *
@@ -190,46 +244,13 @@ class Listo_Core_Action_Solo extends Listo_Action
    * @param int   $index     Index of the current row
    *
    * @return bool disable ?
-   *
-   * @throws Listo_Exception Can't test action disabling: unknown rule operator :operator
    */
   public function test_disable($user_data, $index)
   {
     foreach ($this->_disable_rules as $rule)
     {
-      $submatches = array();
-      if (preg_match('/^:value\((\w+)\)$/D', $rule[0], $submatches))
-      {
-        $field_alias = $submatches[1];
-        switch ($rule[1])
-        {
-          case '=' :
-            if ($user_data['data'][$index]->{$field_alias} == $rule[2])
-              return TRUE;
-          break;
-
-          case '!=' :
-            if ($user_data['data'][$index]->{$field_alias} != $rule[2])
-              return TRUE;
-          break;
-
-          case 'match' :
-            if (preg_match($rule[2], $user_data['data'][$index]->{$field_alias}))
-              return TRUE;
-          break;
-
-          case '!match' :
-            if ( ! preg_match($rule[2], $user_data['data'][$index]->{$field_alias}))
-              return TRUE;
-          break;
-
-          default :
-            throw new Listo_Exception(
-              'Can\'t test action disabling: unknown rule operator :operator',
-              array(':operator' => $rule[1])
-            );
-        }
-      }
+      if ($this->_test_disable_rule($rule, $user_data, $index) === TRUE)
+        return TRUE;
     }
 
     return FALSE;
