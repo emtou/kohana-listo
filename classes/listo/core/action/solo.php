@@ -130,6 +130,8 @@ class Listo_Core_Action_Solo extends Listo_Action
             array(':operator' => $rule[1])
           );
       }
+
+      return FALSE;
     }
 
     throw new Listo_Exception(
