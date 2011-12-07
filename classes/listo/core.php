@@ -56,7 +56,7 @@ class Listo_Core
    *
    * @return null
    */
-  private function __construct($alias)
+  protected function __construct($alias)
   {
     $this->alias = $alias;
     $this->table = Table::factory();
@@ -219,7 +219,7 @@ class Listo_Core
    */
   public static function factory($alias)
   {
-    return new self($alias);
+    return new static($alias);
   }
 
 
